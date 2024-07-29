@@ -76,3 +76,60 @@ class Solution {
 
 }
 ```
+
+**PRIM'S ALGORITHM** 
+
+This is used for MST, prim's algo follows greedy Approach(Selecting the local best), we'll use a min Heap based on cost for object {target,cost} & a visited set; we'll take out the min cost object out and add if it's not in visited and discard if it is, when adding in visited we'll also add extra entries into heap for new costs originating from the current target point as source.
+
+```
+class Solution {
+    public int minCostConnectPoints(int[][] points) {
+        int n = points.length;
+        HashSet<Integer> visited = new HashSet<Integer>();
+        HashSet<Integer> unVisited = new HashSet<Integer>();
+        for(int i=0;i<n;i++){
+            unVisited.add(i);
+        }
+        PriorityQueue<TargetCostObj> costQueue = new PriorityQueue<TargetCostObj>(Comparator.comparingInt(e -> e.cost));
+        costQueue.add(new TargetCostObj(0,0)); //signifies that there is a point from 0th to 0th with 0 cost
+        
+        int ans = 0;
+
+        while(visited.size()<n || !costQueue.isEmpty()){
+            TargetCostObj curr = costQueue.poll();
+            // System.out.println("curr target is "+curr.target);
+            // if there's a condition to add a node to visited SET
+            if(!visited.contains(curr.target)){
+                // System.out.println("visited has elements count " + visited.size());
+                visited.add(curr.target);
+                unVisited.remove(curr.target);
+                ans+= curr.cost;
+
+                int source = curr.target;
+                // Add all new Targets with costs Eg-> point
+                for(int i : unVisited){
+                    if(!visited.contains(i)){
+                        TargetCostObj newProp = new TargetCostObj(i, manhattenCost(points[i],points[source]));
+                        costQueue.add(newProp);
+                    }
+                }
+            }
+        }
+        return ans;
+
+    }
+    public int manhattenCost(int[] point1, int[] point2){
+        return Math.abs(point1[0]-point2[0]) + Math.abs(point1[1]-point2[1]);
+    }
+
+    class TargetCostObj{
+        int target;
+        int cost;
+
+        public TargetCostObj(int target, int cost){
+            this.target=target;
+            this.cost=cost;
+        }
+    }
+}
+```
